@@ -61,18 +61,16 @@ class ProductServiceTest {
         verifyNoMoreInteractions(repository);
     }
     @Test
-            @Disabled
-     // ska man verkligen kolla detta????
-    void whenGetProductById_thenExactlyOneInteractionWithRepositoryMethodGet() {
+    void whenGetProductById_thenGettingThatExactProduct() {
         //given
         int id = 99;
         Product product = new Product("Nytt igen", 30.00, "","","");
+        product.setId(id);
         given(repository.findById(id)).willReturn(Optional.of(product));
         //when
-        underTest.getProductById(id);
+        Product product2 = underTest.getProductById(id);
         //then
-        verify(repository, times(1));
-        // assertEquals(product, productCaptor.getValue());
+        assertEquals(product2, product);
     }
     @Test
     void whenGetProductById_ifProductDoesNotExist_thenThrowException(){
@@ -107,6 +105,7 @@ class ProductServiceTest {
         BadRequestException exception = assertThrows(BadRequestException.class,
                 //when
                 ()-> underTest.addProduct(product));
+        assertEquals("En produkt med titeln: " + title + " finns redan", exception.getMessage());
         verify(repository,times(1)).findByTitle(title);
         verify(repository, never()).save(any());
 
